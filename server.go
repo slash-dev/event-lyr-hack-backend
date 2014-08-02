@@ -11,7 +11,7 @@ var db Database
 
 var debug bool
 
-func GetUser(access_token string) User {
+func GetUser(access_token string) (User, error) {
   google_user := new(googlePlusUser)
   if !debug {
     resp, err := http.Get(
@@ -19,7 +19,7 @@ func GetUser(access_token string) User {
       access_token)
     if err != nil {
       log.Print("Error getting google user")
-      return User{}
+      return User{}, nil// TODO: error.New("Error getting google user")
     }
     decoder := json.NewDecoder(resp.Body)
     decoder.Decode(&google_user)
@@ -31,13 +31,19 @@ func GetUser(access_token string) User {
   }
   user := db.GetUser(google_user)
   log.Print(user)
-  return user
+  return user, nil
 }
 
 func me(w http.ResponseWriter, r *http.Request) {
+  log.Print("/me")
   access_token := r.FormValue("access_token")
   log.Print("access token: " + access_token)
-  user := GetUser(access_token)
+  user, err := GetUser(access_token)
+  if err != nil {
+    log.Print("Error getting google user")
+    return
+  }
+
   serialized_user, err := json.Marshal(user)
 
   if err != nil {
@@ -50,18 +56,19 @@ func me(w http.ResponseWriter, r *http.Request) {
 }
 
 func create_event(w http.ResponseWriter, r *http.Request) {
+  log.Print("/me/CreateEvent")
   access_token := r.FormValue("access_token")
   log.Print("access token: " + access_token)
-  user := GetUser(access_token)
-  user.Events = []Event{}
-  title := r.FormValue("title")
-  var participants []User
-  err := json.Unmarshal([]byte(r.FormValue("participants")), &participants)
+  user, err := GetUser(access_token)
   if err != nil {
-    log.Print(err)
+    log.Print("Error getting google user")
     return
   }
-  participants = append(participants, user)
+  user.Events = []Event{}
+  title := r.FormValue("title")
+  r.ParseForm()
+  participants := r.Form["participants"]
+  participants = append(participants, user.Id)
   event := db.CreateEvent(title, participants)
   log.Print(event)
   serialized_event, err := json.Marshal(event)

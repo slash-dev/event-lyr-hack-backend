@@ -46,20 +46,20 @@ func (db *Database) GetUser(google_user *googlePlusUser) User {
   return user
 }
 
-func (db *Database) CreateEvent(title string, participants []User) Event {
+func (db *Database) CreateEvent(title string, participants []string) Event {
   db.last_event_id++
   event := Event{ Id: strconv.FormatInt(db.last_event_id, 10), Title: title}
   db.events[event.Id] = event;
-  event.Participants = participants
-  for _, participant := range participants {
-    if _, ok := db.users[participant.Id]; !ok {
-      log.Print("ERROR: Create event with invalid Id:", participant.Id)
+  for _, participant_id := range participants {
+    if _, ok := db.users[participant_id]; !ok {
+      log.Print("ERROR: Create event with invalid Id:", participant_id)
       continue;
     }
-    db.user_events[participant.Id] =
-        append(db.user_events[participant.Id], event.Id);
+    event.Participants = append(event.Participants, db.users[participant_id])
+    db.user_events[participant_id] =
+        append(db.user_events[participant_id], event.Id);
     db.event_users[event.Id] =
-        append(db.event_users[event.Id], participant.Id);
+        append(db.event_users[event.Id], participant_id);
   }
   return event
 }
