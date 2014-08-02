@@ -1,14 +1,14 @@
 package main
 
 type User struct {
-  Id  string
-  Name string
-  Avatar string
-  Events []Event
+  Id  string `json:"id"`
+  Name string `json:"name"`
+  Avatar string `json:"avatar"`
+  Events []Event `json:"events"`
 }
 
 type Event struct {
-  Id  string
-  Title string
-  Participants []User
+  Id  string `json:"id"`
+  Title string `json:"title"`
+  Participants []User `json:"participants"`
 }
