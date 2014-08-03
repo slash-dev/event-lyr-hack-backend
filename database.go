@@ -2,7 +2,6 @@ package main
 
 import (
   "log"
-  "strconv"
 )
 
 type Database struct {
@@ -46,9 +45,8 @@ func (db *Database) GetUser(google_user *googlePlusUser) User {
   return user
 }
 
-func (db *Database) CreateEvent(title string, participants []string) Event {
-  db.last_event_id++
-  event := Event{ Id: strconv.FormatInt(db.last_event_id, 10), Title: title}
+func (db *Database) CreateEvent(event_id, title string, participants []string) Event {
+  event := Event{ Id: event_id, Title: title}
   db.events[event.Id] = event;
   for _, participant_id := range participants {
     if _, ok := db.users[participant_id]; !ok {

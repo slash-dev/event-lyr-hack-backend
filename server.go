@@ -35,7 +35,9 @@ func GetUser(access_token string) (User, error) {
 }
 
 func me(w http.ResponseWriter, r *http.Request) {
-  log.Print("/me")
+  log.Print("*************************************")
+  log.Print("*                /me                *")
+  log.Print("*************************************")
   access_token := r.FormValue("access_token")
   log.Print("access token: " + access_token)
   user, err := GetUser(access_token)
@@ -56,7 +58,9 @@ func me(w http.ResponseWriter, r *http.Request) {
 }
 
 func create_event(w http.ResponseWriter, r *http.Request) {
-  log.Print("/me/CreateEvent")
+  log.Print("*************************************")
+  log.Print("*         /me/CreateEvent           *")
+  log.Print("*************************************")
   access_token := r.FormValue("access_token")
   log.Print("access token: " + access_token)
   user, err := GetUser(access_token)
@@ -69,7 +73,8 @@ func create_event(w http.ResponseWriter, r *http.Request) {
   r.ParseForm()
   participants := r.Form["participants"]
   participants = append(participants, user.Id)
-  event := db.CreateEvent(title, participants)
+  event_id := r.FormValue("id")
+  event := db.CreateEvent(event_id, title, participants)
   log.Print(event)
   serialized_event, err := json.Marshal(event)
 
