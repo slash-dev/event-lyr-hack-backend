@@ -25,10 +25,10 @@ func (db *Database) Init() {
   db.last_event_id = 0
 }
 
-func (db *Database) GetUser(google_user *googlePlusUser) User {
+func (db *Database) GetUser(google_user *googlePlusUser, user_id string) User {
   user, user_exists := db.users[google_user.Id]
   if !user_exists {
-    user.Id = google_user.Id
+    user.Id = user_id
     user.Name = google_user.Name
     user.Avatar = google_user.Image.Avatar
     db.users[user.Id] = user

@@ -11,7 +11,7 @@ var db Database
 
 var debug bool
 
-func GetUser(access_token string) (User, error) {
+func GetUser(access_token, user_id string) (User, error) {
   google_user := new(googlePlusUser)
   if !debug {
     resp, err := http.Get(
@@ -29,7 +29,7 @@ func GetUser(access_token string) (User, error) {
     google_user.Name = "Name" + access_token;
     google_user.Image.Avatar = "http://avatar.com/" + access_token;
   }
-  user := db.GetUser(google_user)
+  user := db.GetUser(google_user, user_id)
   log.Print(user)
   return user, nil
 }
@@ -39,8 +39,9 @@ func me(w http.ResponseWriter, r *http.Request) {
   log.Print("*                /me                *")
   log.Print("*************************************")
   access_token := r.FormValue("access_token")
+  user_id := r.FormValue("user_id")
   log.Print("access token: " + access_token)
-  user, err := GetUser(access_token)
+  user, err := GetUser(access_token, user_id)
   if err != nil {
     log.Print("Error getting google user")
     return
@@ -62,8 +63,9 @@ func create_event(w http.ResponseWriter, r *http.Request) {
   log.Print("*         /me/CreateEvent           *")
   log.Print("*************************************")
   access_token := r.FormValue("access_token")
+  user_id := r.FormValue("user_id")
   log.Print("access token: " + access_token)
-  user, err := GetUser(access_token)
+  user, err := GetUser(access_token, user_id)
   if err != nil {
     log.Print("Error getting google user")
     return
